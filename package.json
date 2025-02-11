@@ -1,0 +1,40 @@
+{
+  "name": "library-final-task",
+  "version": "1.0.0",
+  "description": "Este é um projeto de gestão de livros desenvolvido em Laravel 11.",
+  "main": "vite.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r-andomguy/library-final-task.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/r-andomguy/library-final-task/issues"
+  },
+  "homepage": "https://github.com/r-andomguy/library-final-task#readme",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "pinia": "^2.3.1",
+    "vite": "^6.1.0",
+    "vue": "^3.5.13",
+    "vue-loader": "^17.4.2",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "laravel-vite-plugin": "^1.2.0",
+    "sass": "^1.84.0"
+  }
+}
