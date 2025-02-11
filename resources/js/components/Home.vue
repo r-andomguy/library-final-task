@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<template>
     <div class="container text-center">
         <h1 class="mb-4 fw-bold text-dark">
             Bem-vindo
@@ -12,32 +10,24 @@
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <div class="card shadow-lg border-0 rounded-3 overflow-hidden h-100">
-                    <a href="{{ route('books.index') }}" class="text-decoration-none">
-                        <img src="{{ asset('images/books.jpeg') }}"
+                    <router-link to="/books" class="text-decoration-none">
+                        <img src="/images/books.jpeg"
                              class="card-img-top img-fluid"
                              style="height: 250px; object-fit: cover;"
                              alt="Livros">
-                    </a>
+                    </router-link>
                     <div class="card-body d-flex flex-column text-center">
                         <h5 class="card-title fw-semibold text-dark">📖 Sessão de Livros</h5>
                         <p class="text-muted small">Gerencie seu acervo de forma prática</p>
                         <div class="mt-auto">
-                            <a href="{{ route('books.index') }}" class="btn btn-outline-dark w-100">
+                            <router-link to="/books" class="btn btn-outline-dark w-100">
                                 Acessar
-                            </a>
+                            </router-link>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @if(session('error'))
-            <div class="alert alert-danger text-center p-2 w-50 mx-auto" style="font-size: 14px;">
-                {{ session('error') }}
-            </div>
-
-
-            <meta http-equiv="refresh" content="3;url={{ route('home') }}">
-        @endif
-
     </div>
-@endsection
+</template>
+
