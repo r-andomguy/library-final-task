@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
 use Exception;
@@ -58,6 +59,38 @@ class BookController extends Controller {
         return redirect()->route('books.index')->with('success', 'Livro cadastrado com sucesso!');
     }
 
+    /**
+     * @throws Exception
+     * @noinspection DuplicatedCode
+     */
+    private function processCoverImage ($image): string {
+        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+        $path = storage_path("app/public/covers/$filename");
+
+        $img = null;
+        if ($image->getClientOriginalExtension() === 'jpg') {
+            $img = imagecreatefromjpeg($image->getRealPath());
+        } elseif ($image->getClientOriginalExtension() === 'png') {
+            $img = imagecreatefrompng($image->getRealPath());
+        }
+
+        if (!$img) {
+            throw new Exception('Formato de imagem não suportado.');
+        }
+
+        $resizedImg = imagescale($img, 200, 200);
+
+        if ($image->getClientOriginalExtension() === 'jpg') {
+            imagejpeg($resizedImg, $path);
+        } elseif ($image->getClientOriginalExtension() === 'png') {
+            imagepng($resizedImg, $path);
+        }
+
+        imagedestroy($img);
+        imagedestroy($resizedImg);
+
+        return $filename;
+    }
 
     public function show ($id) {
         $book = Book::with('author')->findOrFail($id);
@@ -66,13 +99,11 @@ class BookController extends Controller {
         return view('books.show', compact('book'));
     }
 
-
     public function edit ($id) {
         $book = Book::findOrFail($id);
         $authors = Author::orderByRaw('id = ' . $book->author . ' DESC, name ASC')->get();
         return view('books.edit', compact('book', 'authors'));
     }
-
 
     /** @noinspection DuplicatedCode
      * @throws Exception
@@ -112,7 +143,6 @@ class BookController extends Controller {
         return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso!');
     }
 
-
     public function destroy ($id) {
         $book = Book::findOrFail($id);
 
@@ -123,38 +153,6 @@ class BookController extends Controller {
         $book->delete();
 
         return redirect()->route('books.index')->with('success', 'Livro removido com sucesso!');
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function processCoverImage ($image): string {
-        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-        $path = storage_path("app/public/covers/$filename");
-
-        $img = null;
-        if ($image->getClientOriginalExtension() === 'jpg') {
-            $img = imagecreatefromjpeg($image->getRealPath());
-        } elseif ($image->getClientOriginalExtension() === 'png') {
-            $img = imagecreatefrompng($image->getRealPath());
-        }
-
-        if (!$img) {
-            throw new Exception('Formato de imagem não suportado.');
-        }
-
-        $resizedImg = imagescale($img, 200, 200);
-
-        if ($image->getClientOriginalExtension() === 'jpg') {
-            imagejpeg($resizedImg, $path);
-        } elseif ($image->getClientOriginalExtension() === 'png') {
-            imagepng($resizedImg, $path);
-        }
-
-        imagedestroy($img);
-        imagedestroy($resizedImg);
-
-        return $filename;
     }
 
 }
