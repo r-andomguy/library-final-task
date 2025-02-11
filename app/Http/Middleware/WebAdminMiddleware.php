@@ -14,7 +14,7 @@ class WebAdminMiddleware {
      * @param Closure(Request): (Response) $next
      */
     public function handle (Request $request, Closure $next): Response {
-        if(!Auth::check()){
+        if (!Auth::check()) {
             return redirect()->route('auth.web');
         }
 
