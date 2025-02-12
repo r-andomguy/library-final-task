@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Middleware\ApiAdminMiddleware;
+use App\Http\Middleware\EnsureDatabaseExists;
+use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Middleware\WebAdminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,14 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            EnsureFrontendRequestsAreStateful::class,
         ]);
 
         $middleware->alias([
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-            'web-admin' => \App\Http\Middleware\WebAdminMiddleware::class,
-            'api-admin' => \App\Http\Middleware\ApiAdminMiddleware::class,
-            \App\Http\Middleware\EnsureDatabaseExists::class
+            'verified' => EnsureEmailIsVerified::class,
+            'web-admin' => WebAdminMiddleware::class,
+            'api-admin' => ApiAdminMiddleware::class,
+            EnsureDatabaseExists::class
         ]);
 
         //
