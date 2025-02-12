@@ -13,7 +13,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return response()->json($request->user());
 });
 
-Route::middleware(['auth:sanctum', 'api-admin'])->group(function () {
+Route::middleware(['api-admin'])->group(function () {
     Route::apiResource('authors', AuthorController::class);
     Route::apiResource('books', BookController::class);
 });
