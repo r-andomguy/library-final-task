@@ -6,7 +6,7 @@
     <title>Biblioteca Inovcorp</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body class="bg-dark-subtle">
 <div id="app"></div>
 </body>
 </html>
