@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller {
@@ -61,6 +62,12 @@ class BookController extends Controller {
      */
     private function processCoverImage ($image): string {
         $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+
+        $directory = storage_path('app/public/covers');
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
         $path = storage_path("app/public/covers/$filename");
 
         $img = null;
@@ -96,20 +103,23 @@ class BookController extends Controller {
     }
 
     public function update (Request $request, $id) {
-        $request->validate(
-            [
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'publishDate' => 'required|date',
-                'author' => 'required|exists:authors,id',
-                'cover' => 'nullable|image|mimes:jpg,png|max:2048',
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'publishDate' => 'required|date',
+            'author' => 'required|exists:authors,id',
+            'cover' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (
+                        !($value instanceof UploadedFile) &&
+                        !(is_string($value) && preg_match('/^data:image\/(jpeg|png|gif);base64,/', $value))
+                    ) {
+                        $fail('A capa deve ser um arquivo de imagem ou uma string base64 válida.');
+                    }
+                },
             ],
-            [
-                'cover.image' => 'O arquivo enviado deve ser uma imagem.',
-                'cover.mimes' => 'A imagem deve estar no formato JPG ou PNG.',
-                'cover.max' => 'A imagem não pode ter mais de 2MB.',
-            ]
-        );
+        ]);
 
         try {
             $book = Book::findOrFail($id);
@@ -118,11 +128,40 @@ class BookController extends Controller {
             $book->publishDate = $request->publishDate;
             $book->author = $request->author;
 
-            if ($request->hasFile('cover')) {
+            if (is_null($request->cover)) {
+                if ($book->cover) {
+                    Storage::delete("public/covers/$book->cover");
+                }
+                $book->cover = null;
+            } elseif ($request->cover instanceof UploadedFile) {
                 if ($book->cover) {
                     Storage::delete("public/covers/$book->cover");
                 }
                 $book->cover = $this->processCoverImage($request->file('cover'));
+            } // Se for base64
+            elseif (is_string($request->cover)) {
+                preg_match('/^data:image\/(jpeg|png|gif);base64,/', $request->cover, $matches);
+                $extension = $matches[1] ?? 'png';
+                $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $request->cover));
+
+                $tempFile = tmpfile();
+                $tempFilePath = stream_get_meta_data($tempFile)['uri'];
+                file_put_contents($tempFilePath, $imageData);
+
+                $uploadedFile = new UploadedFile(
+                    $tempFilePath,
+                    "cover.$extension",
+                    mime_content_type($tempFilePath),
+                    null,
+                    true
+                );
+
+                if ($book->cover) {
+                    Storage::delete("public/covers/$book->cover");
+                }
+
+                $book->cover = $this->processCoverImage($uploadedFile);
+                fclose($tempFile);
             }
 
             $book->save();
