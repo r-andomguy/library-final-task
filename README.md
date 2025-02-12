@@ -43,10 +43,16 @@ Gere a chave da aplicação:
 php artisan key:generate
 ```
 
-Inicie o servidor:
+Instalar as dependências do projeto:
 
 ```sh
-php artisan serve
+npm install
+```
+
+Inicie o servidor de desenvolvimento:
+
+```sh
+npm install
 ```
 
 ## Funcionalidades
