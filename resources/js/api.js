@@ -1,5 +1,8 @@
 import axios from "axios";
 
+axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.withCredentials = true;
+
 const api = axios.create({
     baseURL: 'http://localhost:8000/api',
     withCredentials: true,
@@ -7,6 +10,8 @@ const api = axios.create({
         'X-Requested-With': 'XMLHttpRequest',
     },
 });
+
+
 
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('token');
@@ -17,3 +22,4 @@ api.interceptors.request.use(config => {
 });
 
 export default api;
+

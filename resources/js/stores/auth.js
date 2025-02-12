@@ -1,50 +1,41 @@
-import { defineStore } from "pinia";
-import api from "../api";
+import api from '../api';
+import {defineStore} from "pinia";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         user: null,
-        token: localStorage.getItem("token") || null,
+        token: localStorage.getItem('token') || null,
     }),
     actions: {
         async login(credentials) {
             try {
                 const response = await api.post("/login", credentials);
+
+                localStorage.setItem("token", response.data.token);
+
                 this.token = response.data.token;
-                localStorage.setItem("token", this.token);
 
                 await this.fetchUser();
+
                 return true;
             } catch (error) {
-                console.error("Erro no login", error);
                 return false;
             }
         },
-        async fetchUser() {
-            if (!this.token) return;
 
+        async fetchUser() {
             try {
-                const response = await api.get("/user", {
-                    headers: { Authorization: `Bearer ${this.token}` },
-                });
+                const response = await api.get("/user");
                 this.user = response.data;
             } catch (error) {
-                console.error("Erro ao buscar usuário", error);
-                this.logout();
+                this.user = null;
             }
         },
-        async logout() {
-            try {
-                await api.post("/logout", {
-                    headers: { Authorization: `Bearer ${this.token}` },
-                });
-            } catch (error) {
-                console.error("Erro no logout", error);
-            }
 
-            this.user = null;
-            this.token = null;
+        logout() {
             localStorage.removeItem("token");
-        },
+            this.token = null;
+            this.user = null;
+        }
     },
 });

@@ -1,19 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from "./stores/auth";
+import {createRouter, createWebHistory} from 'vue-router';
+import {useAuthStore} from "./stores/auth";
 import Home from './components/Home.vue';
 import Login from './views/Login.vue';
-import BookAdd from './components/Book/BookAdd.vue';
-import BookList from './components/Book/BookList.vue';
-import BookDetail from './components/Book/BookDetail.vue';
-import BookEdit from './components/Book/BookEdit.vue';
+import Book from './components/Book/Book.vue';
 
 const routes = [
-    { path: '/', component: Home, name: 'home' },
-    { path: '/auth-web', component: Login, name: 'auth-web' },
-    { path: '/book/create', component: BookAdd },
-    { path: '/books', component: BookList },
-    { path: '/books/:id', component: BookDetail, props: true },
-    { path: '/books/:id/edit', component: BookEdit },
+    {path: '/', component: Home, name: 'home',},
+    {path: '/auth-web', component: Login, name: 'auth-web'},
+    {path: '/books', component: Book, props: true},
 ];
 
 const router = createRouter({
@@ -24,7 +18,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const auth = useAuthStore();
 
-    if (to.meta.requiresAuth && !auth.token) {
+    if (to.meta?.requiresAuth && !auth.token) {
         next('/auth-web');
     } else {
         next();
